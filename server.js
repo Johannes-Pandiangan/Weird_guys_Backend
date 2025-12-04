@@ -251,6 +251,17 @@ app.get('/', (req, res) => {
     res.send('Smart Library API sedang berjalan...');
 });
 
-app.listen(PORT, () => {
-  console.log(`Server berjalan di port ${PORT}`);
-});
+const startServer = async () => {
+    try {
+        await db.initializeDatabase();
+        
+        app.listen(PORT, () => {
+          console.log(`Server berjalan di port ${PORT}`);
+        });
+    } catch (error) {
+        console.error("Gagal memulai server:", error);
+        process.exit(1);
+    }
+}
+
+startServer();
