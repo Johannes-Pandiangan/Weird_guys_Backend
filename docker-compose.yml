@@ -1,0 +1,35 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smartlibrary-backend
+    env_file:
+      - .env 
+    ports:
+      - "${PORT}:${PORT}" 
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules 
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:14-alpine 
+    container_name: smartlibrary-postgres
+    # ports:
+    #   - "5433:5432" 
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${PGUSER}
+      POSTGRES_PASSWORD: ${PGPASSWORD}
+      POSTGRES_DB: ${PGDATABASE}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data 
+    restart: unless-stopped
+
+
+volumes:
+  postgres-data:
