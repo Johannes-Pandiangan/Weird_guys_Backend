@@ -25,8 +25,19 @@ const CREATE_BOOKS_TABLE_QUERY = `
     description TEXT,
     stock INTEGER NOT NULL DEFAULT 0,
     status VARCHAR(50) NOT NULL,
-    borrowers JSONB DEFAULT '[]'::jsonb,
     added_by_admin VARCHAR(100)
+  );
+`;
+
+// TABEL BARU UNTUK MENCATAT SETIAP PEMINJAMAN
+const CREATE_BORROWINGS_TABLE_QUERY = `
+  CREATE TABLE IF NOT EXISTS borrowings (
+    id SERIAL PRIMARY KEY,
+    book_id INTEGER REFERENCES books(id) ON DELETE CASCADE NOT NULL,
+    borrower_name VARCHAR(255) NOT NULL,
+    borrower_phone VARCHAR(50),
+    borrow_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    handled_by_admin VARCHAR(100) -- Admin yang melayani peminjaman
   );
 `;
 
@@ -48,6 +59,10 @@ async function initializeDatabase() {
   try {
     await pool.query(CREATE_BOOKS_TABLE_QUERY); 
     console.log("PostgreSQL: Tabel 'books' siap.");
+    
+    // EKSEKUSI QUERY TABEL BORROWINGS BARU
+    await pool.query(CREATE_BORROWINGS_TABLE_QUERY); 
+    console.log("PostgreSQL: Tabel 'borrowings' siap.");
     
     await pool.query(CREATE_ADMIN_TABLE_QUERY); 
     console.log("PostgreSQL: Tabel 'admin_users' siap.");
